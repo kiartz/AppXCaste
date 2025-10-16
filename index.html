@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulatore Esonero Universitario</title>
     <style>
+        /* Stili di base (Tema Chiaro) */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f2f5;
@@ -13,8 +14,9 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Allineato in alto per non centrare verticalmente una pagina lunga */
             min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             width: 100%;
@@ -23,12 +25,14 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
         .header {
             padding: 20px;
             background-color: #007bff;
             color: white;
             text-align: center;
+            position: relative; /* Necessario per posizionare il pulsante del tema */
         }
         .header h1 {
             margin: 0;
@@ -63,6 +67,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 20px;
+            transition: border-color 0.3s;
         }
         .question-text {
             font-size: 1.3em;
@@ -104,6 +109,7 @@
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .result-item.correct {
             border-left: 5px solid #28a745;
@@ -117,12 +123,72 @@
         .result-answers span { display: block; margin-top: 5px; }
         .user-answer { color: #dc3545; }
         .correct-answer { color: #28a745; }
+
+        /* --- NOVITÀ: Pulsante Tema --- */
+        .theme-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #fff;
+            color: #007bff;
+            border: 1px solid #007bff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+        }
+        .theme-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- NOVITÀ: Stili Tema Scuro --- */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode .container {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        body.dark-mode .question-card {
+            border: 1px solid #444;
+        }
+        body.dark-mode .options-list label {
+            border: 1px solid #555;
+        }
+        body.dark-mode .options-list label:hover {
+            background-color: #333;
+        }
+        body.dark-mode .result-item {
+            border-color: #444;
+        }
+        body.dark-mode .result-item.correct {
+            background-color: #1a3c26;
+            border-left-color: #28a745;
+        }
+        body.dark-mode .result-item.incorrect {
+            background-color: #4d1a21;
+            border-left-color: #dc3545;
+        }
+        body.dark-mode .user-answer { color: #ff8a8a; }
+        body.dark-mode .correct-answer { color: #8aff8a; }
+        body.dark-mode .theme-button {
+            background-color: #2a2a2a;
+            color: #ffeb3b; /* Giallo sole */
+            border-color: #ffeb3b;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
+            <button id="theme-toggle" class="theme-button">🌙</button>
             <h1>Simulatore di Esonero</h1>
         </div>
         <div class="content">
@@ -147,291 +213,56 @@
 
     <script>
         const allQuestions = [
-            {
-                "question": "Metodo osservativo e tecniche di rilevazione osservative",
-                "type": "single",
-                "options": ["Sono equivalenti", "Rappresentano fasi distinte della ricerca", "Sono interdipendenti"],
-                "correct": ["Sono interdipendenti"]
-            },
-            {
-                "question": "La ricerca osservativa (osservazione diretta) richiede",
-                "type": "single",
-                "options": ["La manipolazione delle variabili indipendenti", "La rinuncia alla manipolazione delle variabili indipendenti", "L’utilizzazione di procedure di valutazione standardizzata"],
-                "correct": ["La rinuncia alla manipolazione delle variabili indipendenti"]
-            },
-            {
-                "question": "La ricerca osservativa si basa",
-                "type": "single",
-                "options": ["Sul giudizio dell’osservatore", "Sulla registrazione automatica di uno strumento", "Sulla utilizzazione di prove o questionari"],
-                "correct": ["Sul giudizio dell’osservatore"]
-            },
-            {
-                "question": "Il luogo in cui viene effettuata la raccolta dei dati per la ricerca osservativa è",
-                "type": "single",
-                "options": ["ambiente naturale", "Laboratorio", "Può essere entrambi"],
-                "correct": ["Può essere entrambi"]
-            },
-            {
-                "question": "La parola chiave nella modalità di osservazione sono",
-                "type": "multiple",
-                "options": ["Sistematicità", "Individuazione di confini tra normale e patologico", "Registrazione del comportamento", "Assenza di influenza da parte dell’osservatore", "Descrizione dei comportamenti involontari dei bambini"],
-                "correct": ["Sistematicità", "Registrazione del comportamento"]
-            },
-            {
-                "question": "La memoria rappresenta un aiuto ai ﬁni di una accurata descrizione.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "L’osservazione ha essenzialmente una ﬁnalità descrittiva e non esplicativa",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Una distinzione importante riguarda la scelta del metodo e della tecnica di rilevazione",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "L'osservazione ecologica si muova dalla constatazione che",
-                "type": "single",
-                "options": ["Persone diverse poste nello stesso ambiente mostrano comportamenti differenti", "Il comportamento delle persone cambia in funzione delle circostanze in viene a veriﬁcarsi-Il contesto esercita vincoli sul comportamento-organismo, comportamento, ambiente sono interdipendenti"],
-                "correct": ["Il comportamento delle persone cambia in funzione delle circostanze in viene a veriﬁcarsi-Il contesto esercita vincoli sul comportamento-organismo, comportamento, ambiente sono interdipendenti"]
-            },
-            {
-                "question": "Il comportamento viene indagato attraverso unità signiﬁcative in rapporto a speciﬁci contesti",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "La descrizione dei behavior setting mira a identiﬁcare le proprietà strutturali e dinamiche degli ambienti cui le persone devono adattarsi ed è caratterizzata dai seguenti principi",
-                "type": "multiple",
-                "options": ["L'ambiente assume valore solo in relazione al comportamento osservato", "Lo schema dipende da un particolare ambiente spazio-temporale", "Lo schema comportamentale è indipendente dalla persona", "Lo schema comportamentale dipende dalla speciﬁca persona che lo mette in atto", "L'ambiente esiste indipendentemente dallo schema comportamentale osservato"],
-                "correct": ["Lo schema dipende da un particolare ambiente spazio-temporale", "Lo schema comportamentale è indipendente dalla persona"]
-            },
-            {
-                "question": "Quando parliamo di behaviour setting ci si riferisce al comportamento individuale e non al comportamento collettivo relato a speciﬁci ambienti ﬁsici",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Uno egli aspetti fondamentali delle indagini etologiche è la descrizione dettagliata dei moduli comportamenti allo scopo di ricostruire una sorta di storia naturale del comportamento animale e umano.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "All'interno dell'operazione piagetiana, lo stesso modo di procedere del colloquio clinico viene utilizzato per descrivere lo sviluppo dell'intelligenza senso-motoria utilizzando il metodo critico (o quasi sperimentale)",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Il metodo osservativo rappresenta per molti aspetti il metodo elettivo della psicologia dello sviluppo e i soggetti più presenti nella ricerca osservativa sono i bambini piccoli",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Quando l'età entra nella ricerca come variabile evolutiva ossia come fattore che descrive e spiega i cambiamenti del comportamento in rapporto all'età, si può scegliere tra due diversi disegni di ricerca",
-                "type": "single",
-                "options": ["Trasversale e analitico", "Trasversale e longitudinale", "Contestuale e ambientale"],
-                "correct": ["Trasversale e longitudinale"]
-            },
-            {
-                "question": "Il vantaggio principale del disegno trasversale e che consente di avere tempi brevi dati riguardanti soggetti di età uguali anche se non ci dà informazioni sul cambiamento individuale",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Una delle procedure più promettenti per descrivere i gruppi naturali deﬁniti come “reciprocamente scelti dai bambini intorno ad attività comuni o sostenuti da legami affettivi” consiste nel raccogliere le “preferenze associative”.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "L’osservazione dell’individuo focale consiste nell’osservare per un tempo prolungato più di un bambino alla volta, rilevando tutto quello che fanno durante il periodo di osservazione.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Le frequenze possono essere assolute o proporzionali",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Nel saggio di Charlotte Buhler (The social behavior of the child) pubblicato nel 1931 trova voce la posizione a favore del metodo sperimentale, posizione che segnerà il declino dell’osservazione.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Codiﬁcare signiﬁca sintetizzare in misure, in entità numeriche dati qualitativi allo scopo di operare confronti e valutazioni",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "L’approccio induttivo fa riferimento ai diversi passi che conducono prima ad una lista provvisoria di eventi, poi ad una lista più ampia, che viene inﬁne ridotta e riorganizzata in categorie più astratte e meno vincolate a speciﬁci contenuti o eventi.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Le categorie possono essere caratterizzate come categorie molecolari o molari.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Conviene in prima istanza codiﬁcare a livello molare, cioè ad un livello di aggregazione superiore, e poi scendere successivamente alle singole categorie molecolari.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "In uno studio osservativo le scelte possibili sono due",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "La registrazione di eventi senza informazioni temporali è la forma più semplice di registrazione e non richiede assolutamente alcuna informazione di tipo temporale.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Nella sequenza degli eventi non avremo mai codici uguali consecutivi perché, indipendentemente dalla durata dell’evento, la metodologia prevede di registrare il passaggio da un evento all’altro, nell’ordine in cui essi si veriﬁcano.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Vero"]
-            },
-            {
-                "question": "Una variabile della campionatura discontinua è rappresentata dalla campionatura momentanea o istantanea che consiste nel registrare che cosa accade esattamente alla ﬁne di ogni intervallo temporale.",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Nel metodo osservativo la realtà osservata è",
-                "type": "single",
-                "options": ["una copia oggettiva della realtà stessa", "un'interpretazione soggettiva dell'osservatore", "una mediazione tra la realtà e chi osserva"],
-                "correct": ["una mediazione tra la realtà e chi osserva"]
-            },
-            {
-                "question": "La memoria e un valido aiuto nell'osservazione",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "L'osservazione in condizioni controllate",
-                "type": "single",
-                "options": ["è una forma di osservazione diretta", "è una forma di osservazione indiretta", "è una forma di osservazione naturalistica", "non è un metodo osservativo"],
-                "correct": ["è una forma di osservazione diretta"]
-            },
-            {
-                "question": "L'approccio etnograﬁco (o ecologico) utilizza l'osservazione",
-                "type": "multiple",
-                "options": ["controllata", "non-partecipante", "Partecipante"],
-                "correct": ["non-partecipante", "Partecipante"]
-            },
-            {
-                "question": "Nell'osservazione naturalistica l'osservatore esercita un controllo",
-                "type": "single",
-                "options": ["minimo", "massimo", "medio"],
-                "correct": ["minimo"]
-            },
-            {
-                "question": "Piaget propone un'osservazione",
-                "type": "single",
-                "options": ["quasi sperimentale", "distaccata", "naturalistica"],
-                "correct": ["quasi sperimentale"]
-            },
-            {
-                "question": "Le categorie molecolari rilevano",
-                "type": "single",
-                "options": ["Tutti i comportamenti", "Comportamenti globali", "Comportamenti elementari"],
-                "correct": ["Comportamenti elementari"]
-            },
-            {
-                "question": "La familiarizzazione è",
-                "type": "single",
-                "options": ["Un correttivo utile quando devo osservare un neonato nei primi mesi di vita", "Un correttivo per limitare la reattività dei soggetti osservati", "Un correttivo utile per limitare le distorsioni dovute alle caratteristiche dell'osservatore", "Un correttivo da utilizzare per realizzare una rilevazione a intervalli temporali"],
-                "correct": ["Un correttivo per limitare la reattività dei soggetti osservati"]
-            },
-            {
-                "question": "Nell'individuazione delle categorie che compongono uno schema di codiﬁca si utilizza un approccio deduttivo/razionale se tali categorie sono individuate a partire da osservazioni empiriche condotte dal ricercatore",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "Le categorie operazionali",
-                "type": "single",
-                "options": ["consentono di eseguire operazioni all'interno dello schema di codiﬁca", "si riferiscono a comportamenti osservabili", "servono a favorire l'interpretazione dell'osservatore"],
-                "correct": ["si riferiscono a comportamenti osservabili"]
-            },
-            {
-                "question": "Nella registrazione per eventi non è possibile registrare informazioni temporali",
-                "type": "true-false",
-                "options": ["Vero", "Falso"],
-                "correct": ["Falso"]
-            },
-            {
-                "question": "La validità è la capacità di uno strumento di rilevare",
-                "type": "single",
-                "options": ["qualsiasi comportamento", "ciò che si propone di rilevare", "un comportamento in modo preciso"],
-                "correct": ["ciò che si propone di rilevare"]
-            },
-            {
-                "question": "La validità concorrente è",
-                "type": "single",
-                "options": ["Il grado di concordanza tra diversi strumenti che misurano lo stesso costrutto", "La capacità di uno strumento di prevedere risultati futuri", "La capacità dello strumento di registrare comportamenti espressione del costrutto-guida", "Nessuna delle precedenti"],
-                "correct": ["Il grado di concordanza tra diversi strumenti che misurano lo stesso costrutto"]
-            },
-            {
-                "question": "Per validità esterna della ricerca si intende che",
-                "type": "single",
-                "options": ["I risultati sono generalizzabili ad altre situazioni", "I risultati si conformano alla teoria di riferimento", "La relazione tra variabile indipendente e variabile dipendente è quella proposta dallo sperimentatore"],
-                "correct": ["I risultati sono generalizzabili ad altre situazioni"]
-            },
-            {
-                "question": "I questionari e le scale di valutazione",
-                "type": "single",
-                "options": ["sono limitati alla prima infanzia", "rilevano e misurano una determinata caratteristica psicologica", "possono essere utilizzati solo da osservatori esperti"],
-                "correct": ["rilevano e misurano una determinata caratteristica psicologica"]
-            },
-            {
-                "question": "Il resoconto è",
-                "type": "single",
-                "options": ["un riassunto sintetico di ciò che accade", "una registrazione fedele del comportamento", "una rafﬁgurazione del fenomeno osservato"],
-                "correct": ["una registrazione fedele del comportamento"]
-            },
-            {
-                "question": "Il Kappa di Cohen è una statistica designata a",
-                "type": "single",
-                "options": ["Calcolare la percentuale di accordo", "Misurare la validità dell'osservazione", "Correggere l'accordo rispetto al caso"],
-                "correct": ["Correggere l'accordo rispetto al caso"]
-            },
-            {
-                "question": "L'effetto Hawthorne è una distorsione riguardante",
-                "type": "single",
-                "options": ["l'osservatore", "i soggetti osservati", "lo strumento osservativo"],
-                "correct": ["i soggetti osservati"]
-            }
+            // Le tue domande sono qui...
+            { "question": "Metodo osservativo e tecniche di rilevazione osservative", "type": "single", "options": ["Sono equivalenti", "Rappresentano fasi distinte della ricerca", "Sono interdipendenti"], "correct": ["Sono interdipendenti"] },
+            { "question": "La ricerca osservativa (osservazione diretta) richiede", "type": "single", "options": ["La manipolazione delle variabili indipendenti", "La rinuncia alla manipolazione delle variabili indipendenti", "L’utilizzazione di procedure di valutazione standardizzata"], "correct": ["La rinuncia alla manipolazione delle variabili indipendenti"] },
+            { "question": "La ricerca osservativa si basa", "type": "single", "options": ["Sul giudizio dell’osservatore", "Sulla registrazione automatica di uno strumento", "Sulla utilizzazione di prove o questionari"], "correct": ["Sul giudizio dell’osservatore"] },
+            { "question": "Il luogo in cui viene effettuata la raccolta dei dati per la ricerca osservativa è", "type": "single", "options": ["ambiente naturale", "Laboratorio", "Può essere entrambi"], "correct": ["Può essere entrambi"] },
+            { "question": "La parola chiave nella modalità di osservazione sono", "type": "multiple", "options": ["Sistematicità", "Individuazione di confini tra normale e patologico", "Registrazione del comportamento", "Assenza di influenza da parte dell’osservatore", "Descrizione dei comportamenti involontari dei bambini"], "correct": ["Sistematicità", "Registrazione del comportamento"] },
+            { "question": "La memoria rappresenta un aiuto ai ﬁni di una accurata descrizione.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "L’osservazione ha essenzialmente una ﬁnalità descrittiva e non esplicativa", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Una distinzione importante riguarda la scelta del metodo e della tecnica di rilevazione", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "L'osservazione ecologica si muova dalla constatazione che", "type": "single", "options": ["Persone diverse poste nello stesso ambiente mostrano comportamenti differenti", "Il comportamento delle persone cambia in funzione delle circostanze in viene a veriﬁcarsi-Il contesto esercita vincoli sul comportamento-organismo, comportamento, ambiente sono interdipendenti"], "correct": ["Il comportamento delle persone cambia in funzione delle circostanze in viene a veriﬁcarsi-Il contesto esercita vincoli sul comportamento-organismo, comportamento, ambiente sono interdipendenti"] },
+            { "question": "Il comportamento viene indagato attraverso unità signiﬁcative in rapporto a speciﬁci contesti", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "La descrizione dei behavior setting mira a identiﬁcare le proprietà strutturali e dinamiche degli ambienti cui le persone devono adattarsi ed è caratterizzata dai seguenti principi", "type": "multiple", "options": ["L'ambiente assume valore solo in relazione al comportamento osservato", "Lo schema dipende da un particolare ambiente spazio-temporale", "Lo schema comportamentale è indipendente dalla persona", "Lo schema comportamentale dipende dalla speciﬁca persona che lo mette in atto", "L'ambiente esiste indipendentemente dallo schema comportamentale osservato"], "correct": ["Lo schema dipende da un particolare ambiente spazio-temporale", "Lo schema comportamentale è indipendente dalla persona"] },
+            { "question": "Quando parliamo di behaviour setting ci si riferisce al comportamento individuale e non al comportamento collettivo relato a speciﬁci ambienti ﬁsici", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Uno egli aspetti fondamentali delle indagini etologiche è la descrizione dettagliata dei moduli comportamenti allo scopo di ricostruire una sorta di storia naturale del comportamento animale e umano.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "All'interno dell'operazione piagetiana, lo stesso modo di procedere del colloquio clinico viene utilizzato per descrivere lo sviluppo dell'intelligenza senso-motoria utilizzando il metodo critico (o quasi sperimentale)", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Il metodo osservativo rappresenta per molti aspetti il metodo elettivo della psicologia dello sviluppo e i soggetti più presenti nella ricerca osservativa sono i bambini piccoli", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Quando l'età entra nella ricerca come variabile evolutiva ossia come fattore che descrive e spiega i cambiamenti del comportamento in rapporto all'età, si può scegliere tra due diversi disegni di ricerca", "type": "single", "options": ["Trasversale e analitico", "Trasversale e longitudinale", "Contestuale e ambientale"], "correct": ["Trasversale e longitudinale"] },
+            { "question": "Il vantaggio principale del disegno trasversale e che consente di avere tempi brevi dati riguardanti soggetti di età uguali anche se non ci dà informazioni sul cambiamento individuale", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Una delle procedure più promettenti per descrivere i gruppi naturali deﬁniti come “reciprocamente scelti dai bambini intorno ad attività comuni o sostenuti da legami affettivi” consiste nel raccogliere le “preferenze associative”.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "L’osservazione dell’individuo focale consiste nell’osservare per un tempo prolungato più di un bambino alla volta, rilevando tutto quello che fanno durante il periodo di osservazione.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Le frequenze possono essere assolute o proporzionali", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Nel saggio di Charlotte Buhler (The social behavior of the child) pubblicato nel 1931 trova voce la posizione a favore del metodo sperimentale, posizione che segnerà il declino dell’osservazione.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Codiﬁcare signiﬁca sintetizzare in misure, in entità numeriche dati qualitativi allo scopo di operare confronti e valutazioni", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "L’approccio induttivo fa riferimento ai diversi passi che conducono prima ad una lista provvisoria di eventi, poi ad una lista più ampia, che viene inﬁne ridotta e riorganizzata in categorie più astratte e meno vincolate a speciﬁci contenuti o eventi.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Le categorie possono essere caratterizzate come categorie molecolari o molari.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Conviene in prima istanza codiﬁcare a livello molare, cioè ad un livello di aggregazione superiore, e poi scendere successivamente alle singole categorie molecolari.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "In uno studio osservativo le scelte possibili sono due", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "La registrazione di eventi senza informazioni temporali è la forma più semplice di registrazione e non richiede assolutamente alcuna informazione di tipo temporale.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Nella sequenza degli eventi non avremo mai codici uguali consecutivi perché, indipendentemente dalla durata dell’evento, la metodologia prevede di registrare il passaggio da un evento all’altro, nell’ordine in cui essi si veriﬁcano.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Vero"] },
+            { "question": "Una variabile della campionatura discontinua è rappresentata dalla campionatura momentanea o istantanea che consiste nel registrare che cosa accade esattamente alla ﬁne di ogni intervallo temporale.", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Nel metodo osservativo la realtà osservata è", "type": "single", "options": ["una copia oggettiva della realtà stessa", "un'interpretazione soggettiva dell'osservatore", "una mediazione tra la realtà e chi osserva"], "correct": ["una mediazione tra la realtà e chi osserva"] },
+            { "question": "La memoria e un valido aiuto nell'osservazione", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "L'osservazione in condizioni controllate", "type": "single", "options": ["è una forma di osservazione diretta", "è una forma di osservazione indiretta", "è una forma di osservazione naturalistica", "non è un metodo osservativo"], "correct": ["è una forma di osservazione diretta"] },
+            { "question": "L'approccio etnograﬁco (o ecologico) utilizza l'osservazione", "type": "multiple", "options": ["controllata", "non-partecipante", "Partecipante"], "correct": ["non-partecipante", "Partecipante"] },
+            { "question": "Nell'osservazione naturalistica l'osservatore esercita un controllo", "type": "single", "options": ["minimo", "massimo", "medio"], "correct": ["minimo"] },
+            { "question": "Piaget propone un'osservazione", "type": "single", "options": ["quasi sperimentale", "distaccata", "naturalistica"], "correct": ["quasi sperimentale"] },
+            { "question": "Le categorie molecolari rilevano", "type": "single", "options": ["Tutti i comportamenti", "Comportamenti globali", "Comportamenti elementari"], "correct": ["Comportamenti elementari"] },
+            { "question": "La familiarizzazione è", "type": "single", "options": ["Un correttivo utile quando devo osservare un neonato nei primi mesi di vita", "Un correttivo per limitare la reattività dei soggetti osservati", "Un correttivo utile per limitare le distorsioni dovute alle caratteristiche dell'osservatore", "Un correttivo da utilizzare per realizzare una rilevazione a intervalli temporali"], "correct": ["Un correttivo per limitare la reattività dei soggetti osservati"] },
+            { "question": "Nell'individuazione delle categorie che compongono uno schema di codiﬁca si utilizza un approccio deduttivo/razionale se tali categorie sono individuate a partire da osservazioni empiriche condotte dal ricercatore", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "Le categorie operazionali", "type": "single", "options": ["consentono di eseguire operazioni all'interno dello schema di codiﬁca", "si riferiscono a comportamenti osservabili", "servono a favorire l'interpretazione dell'osservatore"], "correct": ["si riferiscono a comportamenti osservabili"] },
+            { "question": "Nella registrazione per eventi non è possibile registrare informazioni temporali", "type": "true-false", "options": ["Vero", "Falso"], "correct": ["Falso"] },
+            { "question": "La validità è la capacità di uno strumento di rilevare", "type": "single", "options": ["qualsiasi comportamento", "ciò che si propone di rilevare", "un comportamento in modo preciso"], "correct": ["ciò che si propone di rilevare"] },
+            { "question": "La validità concorrente è", "type": "single", "options": ["Il grado di concordanza tra diversi strumenti che misurano lo stesso costrutto", "La capacità di uno strumento di prevedere risultati futuri", "La capacità dello strumento di registrare comportamenti espressione del costrutto-guida", "Nessuna delle precedenti"], "correct": ["Il grado di concordanza tra diversi strumenti che misurano lo stesso costrutto"] },
+            { "question": "Per validità esterna della ricerca si intende che", "type": "single", "options": ["I risultati sono generalizzabili ad altre situazioni", "I risultati si conformano alla teoria di riferimento", "La relazione tra variabile indipendente e variabile dipendente è quella proposta dallo sperimentatore"], "correct": ["I risultati sono generalizzabili ad altre situazioni"] },
+            { "question": "I questionari e le scale di valutazione", "type": "single", "options": ["sono limitati alla prima infanzia", "rilevano e misurano una determinata caratteristica psicologica", "possono essere utilizzati solo da osservatori esperti"], "correct": ["rilevano e misurano una determinata caratteristica psicologica"] },
+            { "question": "Il resoconto è", "type": "single", "options": ["un riassunto sintetico di ciò che accade", "una registrazione fedele del comportamento", "una rafﬁgurazione del fenomeno osservato"], "correct": ["una registrazione fedele del comportamento"] },
+            { "question": "Il Kappa di Cohen è una statistica designata a", "type": "single", "options": ["Calcolare la percentuale di accordo", "Misurare la validità dell'osservazione", "Correggere l'accordo rispetto al caso"], "correct": ["Correggere l'accordo rispetto al caso"] },
+            { "question": "L'effetto Hawthorne è una distorsione riguardante", "type": "single", "options": ["l'osservatore", "i soggetti osservati", "lo strumento osservativo"], "correct": ["i soggetti osservati"] }
         ];
 
-        // Se le domande totali sono meno di 40, usa tutte quelle disponibili.
         const NUM_QUESTIONS = Math.min(40, allQuestions.length);
 
         const startScreen = document.getElementById('start-screen');
@@ -440,13 +271,42 @@
         const startBtn = document.getElementById('start-btn');
         const submitBtn = document.getElementById('submit-btn');
         const questionsWrapper = document.getElementById('questions-wrapper');
+        const themeToggleBtn = document.getElementById('theme-toggle'); // NOVITÀ
 
         let selectedQuestions = [];
 
         startBtn.addEventListener('click', startGame);
         submitBtn.addEventListener('click', showResults);
+        
+        /* --- NOVITÀ: Logica per il Tema Scuro --- */
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggleBtn.textContent = '☀️'; // Icona sole
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggleBtn.textContent = '🌙'; // Icona luna
+                localStorage.setItem('theme', 'light');
+            }
+        }
 
-        // Funzione per mescolare un array (algoritmo di Fisher-Yates)
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        // Applica il tema salvato al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        });
+        /* --- Fine Logica Tema --- */
+
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -458,10 +318,7 @@
         function startGame() {
             startScreen.style.display = 'none';
             quizContainer.style.display = 'block';
-
-            // Mescola tutte le domande e prendine N
             selectedQuestions = shuffleArray([...allQuestions]).slice(0, NUM_QUESTIONS);
-            
             displayQuestions();
         }
 
@@ -470,33 +327,25 @@
             selectedQuestions.forEach((q, index) => {
                 const questionCard = document.createElement('div');
                 questionCard.className = 'question-card';
-
                 const questionText = document.createElement('div');
                 questionText.className = 'question-text';
                 questionText.textContent = `${index + 1}. ${q.question}`;
                 questionCard.appendChild(questionText);
-
                 const optionsList = document.createElement('ul');
                 optionsList.className = 'options-list';
-                
-                // Mescola le opzioni, tranne per Vero/Falso
                 const options = q.type === 'true-false' ? q.options : shuffleArray([...q.options]);
-
                 options.forEach(option => {
                     const li = document.createElement('li');
                     const label = document.createElement('label');
                     const input = document.createElement('input');
-                    
                     input.type = q.type === 'multiple' ? 'checkbox' : 'radio';
                     input.name = `question-${index}`;
                     input.value = option;
-
                     label.appendChild(input);
                     label.appendChild(document.createTextNode(' ' + option));
                     li.appendChild(label);
                     optionsList.appendChild(li);
                 });
-
                 questionCard.appendChild(optionsList);
                 questionsWrapper.appendChild(questionCard);
             });
@@ -505,32 +354,23 @@
         function showResults() {
             quizContainer.style.display = 'none';
             resultsContainer.style.display = 'block';
-
             let score = 0;
             const feedbackContainer = document.getElementById('feedback');
             feedbackContainer.innerHTML = '';
-
             selectedQuestions.forEach((q, index) => {
                 const inputs = document.querySelectorAll(`input[name="question-${index}"]:checked`);
                 const userAnswer = Array.from(inputs).map(input => input.value);
-                
-                // Ordina entrambi gli array per un confronto corretto
                 const correctAnswer = [...q.correct].sort();
                 const sortedUserAnswer = [...userAnswer].sort();
-
                 const isCorrect = JSON.stringify(sortedUserAnswer) === JSON.stringify(correctAnswer);
-
                 const resultItem = document.createElement('div');
                 resultItem.classList.add('result-item');
-                
                 const questionP = document.createElement('p');
                 questionP.className = 'result-question';
                 questionP.textContent = `${index + 1}. ${q.question}`;
                 resultItem.appendChild(questionP);
-
                 const answersDiv = document.createElement('div');
                 answersDiv.className = 'result-answers';
-
                 if (isCorrect) {
                     score++;
                     resultItem.classList.add('correct');
@@ -543,23 +383,18 @@
                     const userSpan = document.createElement('span');
                     userSpan.className = 'user-answer';
                     userSpan.innerHTML = `<strong>La tua risposta:</strong> ${userAnswer.length > 0 ? userAnswer.join(', ') : 'Nessuna risposta'}`;
-                    
                     const correctSpan = document.createElement('span');
                     correctSpan.className = 'correct-answer';
                     correctSpan.innerHTML = `<strong>Risposta corretta:</strong> ${q.correct.join(', ')}`;
-                    
                     answersDiv.appendChild(userSpan);
                     answersDiv.appendChild(correctSpan);
                 }
-                
                 resultItem.appendChild(answersDiv);
                 feedbackContainer.appendChild(resultItem);
             });
-
             document.getElementById('score').textContent = `Punteggio: ${score} / ${NUM_QUESTIONS}`;
-            window.scrollTo(0, 0); // Torna in cima alla pagina
+            window.scrollTo(0, 0);
         }
-
     </script>
 
 </body>
